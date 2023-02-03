@@ -1,4 +1,4 @@
-package gen;
+package gen_old;
 
 public class WordGen {
 
