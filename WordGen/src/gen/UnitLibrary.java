@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class UnitLibrary {
 
-	public static Unit[] units = new Unit[30];
+	public static Unit[] units = new Unit[31];
 	public static ArrayList<Unit> vowels = new ArrayList<Unit>(6);
 	public static ArrayList<Unit> consonants = new ArrayList<Unit>(25);
 	
@@ -40,11 +40,12 @@ public class UnitLibrary {
 	public static final int W = 26;
 	public static final int X = 27;
 	public static final int Y = 28;
-	public static final int Z = 29;
+	public static final int Y_ = 29;
+	public static final int Z = 30;
 	
 	//public enum UnitType {A, B, C, CH, D, E, F, G, H, I, J, K, L, M, N, O, P, QU, R, S, SH, T, TH, U, V, W, X, Y, Z}
 	//public static final UnitType[] unitenums = UnitType.values();
-	public static final String[] strs = {"a", "b", "c", "ch", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "ph", "qu", "r", "s", "sh", "t", "th", "u", "v", "w", "x", "y", "z"};
+	public static final String[] strs = {"a", "b", "c", "ch", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "ph", "qu", "r", "s", "sh", "t", "th", "u", "v", "w", "x", "y", "y", "z"};
 
 	public static void loadUnitData(String file) throws FileNotFoundException {
 		Scanner scan = new Scanner(new File(file));
@@ -168,7 +169,8 @@ public class UnitLibrary {
 			case "W": return 26;
 			case "X": return 27;
 			case "Y": return 28;
-			case "Z": return 29;
+			case "Y*": return 29;
+			case "Z": return 30;
 		}
 		return -1;
 	}

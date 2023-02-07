@@ -37,15 +37,18 @@ public class Unit {
 	}
 	
 	public boolean isSolitaryBlend(Unit unit) {
+		if (unit == null) return false;
 		return getRelationship(unit) > 0b100; // returns true if the relationship between this unit and the provided unit is solitary (ie, must be a blend and a 1 in the 3rd bit)
 	}
 	
 	public boolean isValidBlend(Unit unit) {
+		if (unit == null) return false;
 		byte rel = getRelationship(unit);
 		return (rel & 0b011) > 0 || (vowel && unit.isVowel() && rel != 0b100); // returns true if either of the blend bits are 1, or if both are vowels and relationship is not non-pairing
 	}
 	
 	public boolean isValidNeighbor(Unit unit) {
+		if (unit == null) return false;
 		return getRelationship(unit) != 0b100; // returns true as long as relationship is not the no-pairing bit pattern
 	}
 	
