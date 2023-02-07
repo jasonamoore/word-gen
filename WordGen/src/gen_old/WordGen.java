@@ -1,17 +1,20 @@
 package gen_old;
 
+import java.io.FileNotFoundException;
+
+import gen.Syllable;
+import gen.Unit;
+import gen.UnitLibrary;
+import gen.Word;
+
 public class WordGen {
 
-	public static String[] consonants = {"b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", /*"q",*/ "r", "s", "t", "v", "w", "x", "y", "z"};
-
-	public static String[] vowels = {"a", "e", "i", "o", "u", "y"};
-	public static String[] v_blends = {"ai", "au", "ea", "ee", "ei", "eo", "eou", "eu", "ie", "io", "iou", "oa", "oo", "oi", "ou"};
-	public static String[] p_blends = {"sc", "sk", "bl", "cl", "fl", "gl", "kl", "pl", "sl", "br", "cr", "dr", "fr", "gr", "kr", "pr", "tr"};
-	public static String[] i_blends = {"bb", "cc", "dd", "ff", "gg", "ll", "mm", "nn", "pp", "rr", "ss", "tt"};
-	public static String[] s_blends = {"ld", "nd", "rd", "ck", "lk", "nk", "rk", "sk", "wk", "lm", "rm", "sm", "ct", "ght", "lt", "mt", "nt", "pt", "rt", "st", "wt"};
-	public static String[] arc_blends = {"dj", "ch", "gh", "ph", "sh", "th", "gn", "kn", "pn", "wr", "ts", "ps", "qu"};
-
 	public static void main(String[] args) {
+		try {
+			UnitLibrary.loadUnitData("res/data.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		int wc = 1;
 		try {
 			wc = Integer.parseInt(args[0]);	
@@ -27,68 +30,59 @@ public class WordGen {
 		System.out.println();
 	}
 
-	private static final int START = 0;
-	private static final int VOWEL = 1;
-	private static final int CONSONANT = 2;
-	private static final int END = 3;
-	public static String genWord() {
-		boolean gen = true;
-		int gens = 0;
-		String word = "";
-		int state = START;
-		int prestate = state;
-		String[] chooser = vowels;
-		while (gen) {
-			double rand = Math.random();
-			int rint;
-			if (gens > 1 && Math.random() > -(1/12.0) * (gens - 3) + 0.55) {
-				prestate = state;
-				state = END;
-				gen = false;
-			}
-			if (state == START) {
-				rint = (int) (rand * 4);
-				switch (rint) {
-					case 0: chooser = consonants; state = VOWEL; break;
-					case 1: chooser = vowels; state = CONSONANT; break;
-					case 2: chooser = p_blends; state = VOWEL; break;
-					case 3: chooser = arc_blends; state = VOWEL; break;
+	private static String genWord() {
+		// start new Word
+		Word word = new Word();
+		// pick number of syllables
+		int numSyls = (int) (Math.random() * 3) + 1;
+		for (int i = 0; i < numSyls; i++) {
+			// start new Syllable
+			byte restrictions = Syllable.FORCED_CLOSED_END;
+			if (numSyls == 1) { // if first and only syllable, must be closed on start, end, or both
+				switch ((int) (Math.random() * 2)) { // pick a random choice out of two choices
+					case 0: restrictions = Syllable.FORCED_CLOSED_START; break;
+					case 1: restrictions = Syllable.FORCED_CLOSED_END; break;
 				}
 			}
-			else if (state == VOWEL) {
-				rint = (int) (rand * 2);
-				switch (rint) {
-					case 0: chooser = vowels; break;
-					case 1: chooser = v_blends; break;
-				}
-				state = CONSONANT;
+			else if (i == numSyls - 1) { // if last syllable, allow open end
+				restrictions = Syllable.NO_RESTRICTIONS;
 			}
-			else if (state == CONSONANT) {
-				rint = (int) (rand * 4);
-				switch (rint) {
-					case 0: chooser = consonants; break;
-					case 1: chooser = i_blends; break;
-					case 2: chooser = s_blends; break;
-					case 3: chooser = arc_blends; break;
+			Syllable syl = new Syllable(restrictions); // create syllable
+			
+			// GENERATE CONSONANTS
+			if (!syl.forcedOpenStart() && (syl.forcedClosedStart() || (int) (Math.random() * 2) == 1)) { // if syllable has a forced closed start, or 50% chance, generate start consonants
+				Unit nunit = UnitLibrary.getRandomConsonant(); // get random consonant
+				syl.addUnit(nunit);
+				while (nunit.hasOpenBlends() && (int) (Math.random() * 2) == 1) { // while there are blends to make, and 50% chance occurs, continue blending
+					nunit = nunit.getRandomOpenBlendUnit();
+					syl.addUnit(nunit);
 				}
-				state = VOWEL;
 			}
-			else if (state == END) {
-				if (prestate == VOWEL) chooser = vowels;
-				else if (gens > 1) {
-					rint = (int) (rand * 3);
-					switch (rint) {
-						case 0: chooser = consonants; break;
-						case 1: chooser = s_blends; break;
-						case 2: chooser = arc_blends; break;
-					}
+			
+			// GENERATE VOWELS (TODO - could be slightly more efficient
+			Unit vunit = UnitLibrary.getRandomVowel();
+			syl.addUnit(vunit);
+			while (/*vunit.hasBlends() &&*/ (int) (Math.random() * 3) == 2) { // while random chance permits, generate a vowel that does not already exist, (unless it is the only existing one, in which case also halt)
+				// ie, "ee" is allowed and will halt vowel production, but "eae" is not allowed because e already exists and is not the only vowel
+				vunit = UnitLibrary.getRandomVowel();
+				if (syl.getLastUnit().isValidBlend(vunit) && !(syl.contains(vunit) && syl.getNumVowels() > 1)) {
+					if (syl.contains(vunit)) break;
+					syl.addUnit(vunit);
 				}
-				else chooser = consonants;
 			}
-			word += chooser[(int) (Math.random() * chooser.length)];
-			gens++;
+			
+			// GENERATE MORE CONSONANTS
+			if (!syl.forcedOpenEnd() && (syl.forcedClosedEnd() || (int) (Math.random() * 2) == 1)) { // if syllable has a forced closed end, or 50% chance, generate end consonants
+				Unit nunit = UnitLibrary.getRandomConsonant(); // get random consonant
+				syl.addUnit(nunit);
+				while (nunit.hasClosedBlends() && (int) (Math.random() * 2) == 1) { // while there are blends to make, and 50% chance occurs, continue blending
+					nunit = nunit.getRandomClosedBlendUnit();
+					syl.addUnit(nunit);
+				}
+			}
+			word.addSyllable(syl);
 		}
-		return word;
+		return word.toString();
 	}
-
+	
 }

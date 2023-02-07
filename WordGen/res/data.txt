@@ -1,0 +1,178 @@
+a;v: {
+->a=100,
+}
+e;v: {
+}
+i;v: {
+->i=100,
+->y=100,
+}
+o;v: {
+}
+u;v: {
+->u=100,
+}
+b;c: {
+->h=110,
+#solitary because silent
+->l=010,
+->r=010,
+}
+c;c: {
+->k=001,
+->l=010,
+->r=010,
+}
+ch;c: {
+}
+d;c: {
+->h=110,
+#solitary because silent
+->r=010,
+->t=101,
+#solitary because silent
+}
+f;c: {
+->l=010,
+->r=010,
+->t=001,
+}
+g;c: {
+->h=111,
+#solitary because silent
+->l=010,
+->n=111,
+#solitary because silent
+->r=010,
+}
+h;c: {
+->l=001,
+->m=001,
+->n=001,
+}
+j;c: {
+}
+k;c: {
+->h=110,
+#solitary because silent
+->l=010,
+->n=110,
+#solitary because silent
+->r=010,
+}
+l;c: {
+->b=001,
+->ch=001,
+->d=001,
+->f=001,
+->k=001,
+->m=001,
+->n=001,
+->p=001,
+->ph=001,
+->sh=001,
+->t=001,
+->th=001,
+}
+m;c: {
+->b=101,
+#solitary because silent
+->n=101,
+#solitary because silent
+->p=001,
+->t=001,
+->th=001,
+}
+n;c: {
+->ch=001,
+->d=001,
+->g=001,
+->k=001,
+->t=001,
+->th=001,
+}
+p;c: {
+->l=010,
+->n=110,
+#solitary because silent
+->r=010,
+->s=110,
+#solitary because silent
+->t=001,
+}
+ph;c: {
+->l=010,
+->r=010,
+->t=001,
+->th=010,
+}
+qu;c: {
+->u=100,
+}
+r;c: {
+->b=001,
+->c=001,
+->ch=001,
+->d=001,
+->f=001,
+->g=001,
+->h=110,
+#solitary because silent
+->k=001,
+->l=001,
+->m=001,
+->n=001,
+->p=001,
+->sh=001,
+->t=001,
+->th=001,
+}
+s;c: {
+->c=011,
+->k=011,
+->l=010,
+->m=011,
+->n=010,
+->p=011,
+->t=011,
+->w=010,
+}
+sh;c: {
+->r=010,
+->t=001,
+}
+t;c: {
+->ch=001,
+->r=010,
+->w=010,
+}
+th;c: {
+}
+v;c: {
+->l=010,
+}
+w;c: {
+->b=001,
+->ch=001,
+->d=001,
+->g=001,
+->h=110,
+#solitary because silent
+->k=001,
+->l=001,
+->n=001,
+->p=001,
+->ph=001,
+->r=110,
+#solitary because silent
+->s=001,
+->sh=001,
+->t=001,
+->th=001,
+}
+x;c: {
+}
+y;vc: {
+}
+z;c: {
+}

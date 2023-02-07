@@ -4,14 +4,26 @@ import java.util.LinkedList;
 
 public class Word {
 
-	LinkedList<Syllable> sylls;
+	LinkedList<Syllable> syls;
 	
 	public Word() {
-		sylls = new LinkedList<Syllable>();
+		syls = new LinkedList<Syllable>();
+	}
+	
+	public Syllable getLastSyllable() {
+		return syls.size() > 0 ? syls.getLast() : null;
 	}
 	
 	public void addSyllable(Syllable syl) {
-		sylls.add(syl);
+		syls.add(syl);
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Syllable syl : syls) {
+			sb.append(syl.toString());
+		}
+		return sb.toString();
 	}
 	
 }
