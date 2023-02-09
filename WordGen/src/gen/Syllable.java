@@ -26,6 +26,14 @@ public class Syllable {
 		else numConsonants++;
 	}
 	
+	public boolean closedStart() {
+		return units.getFirst().isConsonant();
+	}
+
+	public boolean closedEnd() {
+		return units.getLast().isConsonant();
+	}
+	
 	public int getNumConsonants() {
 		return numConsonants;
 	}

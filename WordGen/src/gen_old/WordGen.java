@@ -34,18 +34,17 @@ public class WordGen {
 		Word word = new Word();
 		// pick number of syllables
 		int numSyls = (int) (Math.random() * 3) + 1;
+		
+		// save last restriction
+		byte restrictions = Syllable.NO_RESTRICTIONS;
 		for (int i = 0; i < numSyls; i++) {
-			// start new Syllable
-			byte restrictions = Syllable.FORCED_OPEN_START | Syllable.FORCED_CLOSED_END;
-			if (numSyls == 1) { // if first and only syllable, must be closed on start, end, or both
-				switch ((int) (Math.random() * 2)) { // pick a random choice out of two choices
-					case 0: restrictions = Syllable.FORCED_CLOSED_START; break;
-					case 1: restrictions = Syllable.FORCED_CLOSED_END; break;
-				}
+			// decide restrictions for the syllable
+			Syllable last = word.getLastSyllable();
+			if (last == null) restrictions = Syllable.NO_RESTRICTIONS;
+			else {
+				if (!last.closedEnd()) restrictions = Syllable.FORCED_CLOSED_START;
 			}
-			else if (i == numSyls - 1) { // if last syllable, allow open end
-				restrictions = Syllable.FORCED_OPEN_START | Syllable.NO_RESTRICTIONS;
-			}
+			
 			Syllable syl = word.generateSyllable(restrictions); // create syllable
 			word.addSyllable(syl);
 		}

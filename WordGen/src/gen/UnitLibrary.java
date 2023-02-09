@@ -2,14 +2,15 @@ package gen;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
+
+import util.Distribution;
 
 public class UnitLibrary {
 
 	public static Unit[] units = new Unit[31];
-	public static ArrayList<Unit> vowels = new ArrayList<Unit>(6);
-	public static ArrayList<Unit> consonants = new ArrayList<Unit>(25);
+	public static Distribution vowels = new Distribution(6);
+	public static Distribution consonants = new Distribution(25);
 	
 	public static final int A = 0;
 	public static final int B = 1;
@@ -43,10 +44,9 @@ public class UnitLibrary {
 	public static final int Y_ = 29;
 	public static final int Z = 30;
 	
-	//public enum UnitType {A, B, C, CH, D, E, F, G, H, I, J, K, L, M, N, O, P, QU, R, S, SH, T, TH, U, V, W, X, Y, Z}
-	//public static final UnitType[] unitenums = UnitType.values();
 	public static final String[] strs = {"a", "b", "c", "ch", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "ph", "qu", "r", "s", "sh", "t", "th", "u", "v", "w", "x", "y", "y", "z"};
 
+	// possibly add more flags for units, like no-end word flag, no-end syllable flag, no-start .. etc
 	public static void loadUnitData(String file) throws FileNotFoundException {
 		Scanner scan = new Scanner(new File(file));
 		StringBuilder sb = new StringBuilder();
@@ -65,8 +65,8 @@ public class UnitLibrary {
 			// variables for the new unit being created
 			int unid;
 			byte[] relations = new byte[units.length];
-			ArrayList<Integer> open = new ArrayList<Integer>();
-			ArrayList<Integer> closed = new ArrayList<Integer>();
+			Distribution open = new Distribution();
+			Distribution closed = new Distribution();
 			boolean cons = false;
 			boolean vowel = false;
 			// find the unit currently being read
@@ -78,12 +78,20 @@ public class UnitLibrary {
 			unid = getIdByString(token);
 			i++; c = data.charAt(i); // ; skip semicolon
 			// find whether this unit is a vowel, consonant or both
-			while (c != ':') {
+			while (c != ';') {
 				vowel = vowel | c == 'v';
 				cons = cons | c == 'c';
 				i++; c = data.charAt(i);
 			}
-			i++; // ; skip colon
+			i++; c = data.charAt(i); // ; skip semicolon
+			// find the weight/probability for this unit
+			String wstr = "";
+			while (c != ':') {
+				wstr += c;
+				i++; c = data.charAt(i);
+			}
+			double weight = Double.parseDouble(wstr);
+			i++; // : skip colon
 			i++; // { skip opening curly bracket
 			c = data.charAt(i);
 			// start reading the relationships
@@ -103,17 +111,31 @@ public class UnitLibrary {
 				int bit0 = data.charAt(i + 2) - '0';
 				i += 3; c = data.charAt(i); // skip bits
 				relations[ruid] = (byte) ((bit2 << 2) + (bit1 << 1) + bit0);
-				if (bit1 == 1) open.add(ruid);
-				if (bit0 == 1) closed.add(ruid);
-				if (c == ',') i++; // , skip comma
-				c = data.charAt(i);
+				// blend weight stuff
+				double blweight = 1;
+				if (c == ',') { // no weight defined
+					i++; c = data.charAt(i); // , skip comma
+				}
+				else if (c == ';') { // if there is a defined weight for this blend
+					i++; c = data.charAt(i);
+					String blwstr = ""; // blend weight string
+					while (c != ',' && c != '-' && c != '}') { // until we reach comma, or '-' from the -> in the next line (optional commas), or end bracket
+						blwstr += c;
+						i++; c = data.charAt(i);
+					}
+					blweight = Double.parseDouble(blwstr);
+				}
+				// else, we're at the next token already
+				// add blends to blend distributions
+				if (bit1 == 1) open.addRange(new double[] {blweight, ruid});
+				if (bit0 == 1) closed.addRange(new double[] {blweight, ruid});
 			}
 			i++;
 			// create Unit
 			Unit nunit = new Unit(unid, vowel, cons, relations, open, closed);
 			units[unid] = nunit;
-			if (nunit.isVowel()) vowels.add(nunit);
-			if (nunit.isConsonant()) consonants.add(nunit);
+			if (nunit.isVowel()) vowels.addRange(new double[] {weight, unid});
+			if (nunit.isConsonant()) consonants.addRange(new double[] {weight, unid});
 		}
 		/*for (int y = 0; y < units.length; y++) {
 			System.out.println(getString(units[y]) + getString(units[y].getRandomClosedBlendUnit()));
@@ -121,11 +143,11 @@ public class UnitLibrary {
 	}
 	
 	public static Unit getRandomConsonant() {
-		return consonants.size() > 0 ? consonants.get((int) (Math.random() * consonants.size())) : null;
+		return getById((int) consonants.getRandom());
 	}
 	
 	public static Unit getRandomVowel() {
-		return vowels.size() > 0 ? vowels.get((int) (Math.random() * vowels.size())) : null;
+		return getById((int) vowels.getRandom());
 	}
 	
 	public static Unit getById(int id) {

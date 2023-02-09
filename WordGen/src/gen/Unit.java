@@ -1,6 +1,6 @@
 package gen;
 
-import java.util.ArrayList;
+import util.Distribution;
 
 public class Unit {
 	
@@ -8,10 +8,10 @@ public class Unit {
 	private boolean vowel; // true if vowel
 	private boolean consonant; // true if consonant
 	private byte[] relationships = new byte[UnitLibrary.units.length]; // relationship bits for each unit with this unit
-	private ArrayList<Integer> openblends; // ids of units which form an opening blend with this unit
-	private ArrayList<Integer> closedblends; // ids of units which form an closing blend with this unit
+	private Distribution openblends; // ids of units which form an opening blend with this unit
+	private Distribution closedblends; // ids of units which form an closing blend with this unit
 	
-	public Unit(int id, boolean vowel, boolean consonant, byte[] relationships, ArrayList<Integer> openblends, ArrayList<Integer> closeblends) {
+	public Unit(int id, boolean vowel, boolean consonant, byte[] relationships, Distribution openblends, Distribution closeblends) {
 		this.id = id;
 		this.vowel = vowel;
 		this.consonant = consonant;
@@ -53,11 +53,11 @@ public class Unit {
 	}
 	
 	public boolean hasOpenBlends() {
-		return openblends.size() > 0; // true if there are any open blends
+		return !openblends.isEmpty(); // true if there are any open blends
 	}
 	
 	public boolean hasClosedBlends() {
-		return closedblends.size() > 0; // true if there are any closed blends
+		return !closedblends.isEmpty(); // true if there are any closed blends
 	}
 
 	public boolean hasBlends() {
@@ -65,11 +65,11 @@ public class Unit {
 	}
 	
 	public Unit getRandomOpenBlendUnit() {
-		return hasOpenBlends() ? UnitLibrary.getById(openblends.get((int) (Math.random() * openblends.size()))) : null; // returns a random unit which forms an open blend with this unit
+		return hasOpenBlends() ? UnitLibrary.getById((int) openblends.getRandom()) : null; // returns a random unit which forms an open blend with this unit
 	}
 	
 	public Unit getRandomClosedBlendUnit() {
-		return hasClosedBlends() ? UnitLibrary.getById(closedblends.get((int) (Math.random() * closedblends.size()))) : null; // returns a random unit which forms a closed blend with this unit
+		return hasClosedBlends() ? UnitLibrary.getById((int) closedblends.getRandom()) : null; // returns a random unit which forms a closed blend with this unit
 	}
 	
 	public String toString() {
