@@ -7,17 +7,21 @@ public class Unit {
 	private int id;
 	private boolean vowel; // true if vowel
 	private boolean consonant; // true if consonant
+	private boolean nostart; // true if a syllable can't start with this unit
+	private boolean noend; // true if a syllable can't end with this unit
 	private byte[] relationships = new byte[UnitLibrary.units.length]; // relationship bits for each unit with this unit
 	private Distribution openblends; // ids of units which form an opening blend with this unit
 	private Distribution closedblends; // ids of units which form an closing blend with this unit
 	
-	public Unit(int id, boolean vowel, boolean consonant, byte[] relationships, Distribution openblends, Distribution closeblends) {
+	public Unit(int id, boolean vowel, boolean consonant, byte[] relationships, Distribution openblends, Distribution closeblends, boolean nostart, boolean noend) {
 		this.id = id;
 		this.vowel = vowel;
 		this.consonant = consonant;
 		this.relationships = relationships;
 		this.openblends = openblends;
 		this.closedblends = closeblends;
+		this.nostart = nostart;
+		this.noend = noend;
 	}
 	
 	public int getId() {
@@ -30,6 +34,14 @@ public class Unit {
 	
 	public boolean isConsonant() {
 		return consonant;
+	}
+	
+	public boolean noStart() {
+		return nostart;
+	}
+	
+	public boolean noEnd() {
+		return noend;
 	}
 	
 	private byte getRelationship(Unit unit) {

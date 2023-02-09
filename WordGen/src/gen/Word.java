@@ -29,7 +29,8 @@ public class Word {
 			Unit nunit;
 			do {
 				nunit = UnitLibrary.getRandomConsonant(); // get random consonant
-			} while (lastun != null && !lastun.isValidNeighbor(nunit)); // if the consonant is not a valid neighbor for the previous unit in the word, keep picking
+			} while ((lastun != null && !lastun.isValidNeighbor(nunit)) || (nunit.noStart() && (lastun == null || lastun.isConsonant())));
+			// if the consonant is not a valid neighbor for the previous unit in the word, keep picking (or if the unit cannot start a syllable (unless after a vowel))
 			syl.addUnit(nunit);
 			lastun = nunit;
 			// maybe generate more
@@ -45,7 +46,7 @@ public class Word {
 			}
 		}
 		
-		// GENERATE VOWELS (TODO - could be slightly more efficient
+		// GENERATE VOWELS (could be slightly more efficient)
 		{
 			// generate first vowel
 			Unit vunit;
@@ -75,7 +76,7 @@ public class Word {
 			Unit nunit;
 			do {
 				nunit = UnitLibrary.getRandomConsonant(); // get random consonant
-			} while (!lastun.isValidNeighbor(nunit)); // if the consonant is not a valid neighbor for the previous unit in the word, keep picking
+			} while (!lastun.isValidNeighbor(nunit) || nunit.noEnd()); // if the consonant is not a valid neighbor for the previous unit in the word, keep picking
 			syl.addUnit(nunit);
 			lastun = nunit;
 			// maybe generate more

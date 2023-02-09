@@ -36,7 +36,18 @@ public class Generator {
 		for (int i = 0; i < numSyls; i++) {
 			// decide restrictions for the syllable
 			Syllable last = word.getLastSyllable();
-			if (last == null) restrictions = Syllable.NO_RESTRICTIONS;
+			if (last == null) {
+				if (numSyls > 1) {
+					restrictions = Syllable.NO_RESTRICTIONS;
+				}
+				else {
+					int rand = (int) (Math.random() * 2);
+					switch (rand) {
+						case 0: restrictions = Syllable.FORCED_CLOSED_START; break;
+						case 1: restrictions = Syllable.FORCED_CLOSED_END; break;
+					}
+				}
+			}
 			else {
 				if (!last.closedEnd()) restrictions = Syllable.FORCED_CLOSED_START;
 			}

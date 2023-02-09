@@ -46,7 +46,6 @@ public class UnitLibrary {
 	
 	public static final String[] strs = {"a", "b", "c", "ch", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "ph", "qu", "r", "s", "sh", "t", "th", "u", "v", "w", "x", "y", "y", "z"};
 
-	// possibly add more flags for units, like no-end word flag, no-end syllable flag, no-start .. etc
 	public static void loadUnitData(String file) throws FileNotFoundException {
 		Scanner scan = new Scanner(new File(file));
 		StringBuilder sb = new StringBuilder();
@@ -69,6 +68,8 @@ public class UnitLibrary {
 			Distribution closed = new Distribution();
 			boolean cons = false;
 			boolean vowel = false;
+			boolean nostart = false;
+			boolean noend = false;
 			// find the unit currently being read
 			String token = "";
 			while (c != ';') {
@@ -77,11 +78,22 @@ public class UnitLibrary {
 			}
 			unid = getIdByString(token);
 			i++; c = data.charAt(i); // ; skip semicolon
-			// find whether this unit is a vowel, consonant or both
+			// read flags: -c: consonant, -v: vowel, -ns: no start, -ne: no end
 			while (c != ';') {
-				vowel = vowel | c == 'v';
-				cons = cons | c == 'c';
-				i++; c = data.charAt(i);
+				if (c == '-') {
+					String flag = "";
+					i++; c = data.charAt(i); // skip flag hyphen
+					while (c != '-' && c != ';') { // read characters until next hyphen or semicolon reached
+						flag += c;
+						i++; c = data.charAt(i);
+					}
+					switch (flag) {
+						case "c": cons = true; break;
+						case "v": vowel = true; break;
+						case "ns": nostart = true; break;
+						case "ne": noend = true; break;
+					}
+				}
 			}
 			i++; c = data.charAt(i); // ; skip semicolon
 			// find the weight/probability for this unit
@@ -132,7 +144,7 @@ public class UnitLibrary {
 			}
 			i++;
 			// create Unit
-			Unit nunit = new Unit(unid, vowel, cons, relations, open, closed);
+			Unit nunit = new Unit(unid, vowel, cons, relations, open, closed, nostart, noend);
 			units[unid] = nunit;
 			if (nunit.isVowel()) vowels.addRange(new double[] {weight, unid});
 			if (nunit.isConsonant()) consonants.addRange(new double[] {weight, unid});
