@@ -1,35 +1,50 @@
 package gen;
 
+import java.io.FileNotFoundException;
+
 public class Generator {
 
 	public static void main(String[] args) {
-		// get command-line args for number of words to generate
-		
-		for (int i = 0; /*num*/i < 0; i++) {
-			// print(generateWord());
+		try {
+			UnitLibrary.loadUnitData("res/data.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
+		int wc = 1;
+		try {
+			wc = Integer.parseInt(args[0]);	
+		} catch (Exception e) {
+			wc = 1;
+		}
+		System.out.printf("Printing %d %s:\n", wc, wc == 1 ? "word" : "words");
+		System.out.print(genWord());
+		while (--wc > 0) {
+			System.out.print(", ");
+			System.out.print(genWord());
+		}
+		System.out.println();
 	}
-	
-	public static Word generateWord() {
-		// choose length in syllables
-		//int syls = random number;
+
+	private static String genWord() {
+		// start new Word
 		Word word = new Word();
-		for (int i = 0; /*syls*/i < 0; i++) {
-			//link new syllable to word: generateSyllable(/*i < last syllable?*/true);
+		// pick number of syllables
+		int numSyls = (int) (Math.random() * 3) + 1;
+		
+		// save last restriction
+		byte restrictions = Syllable.NO_RESTRICTIONS;
+		for (int i = 0; i < numSyls; i++) {
+			// decide restrictions for the syllable
+			Syllable last = word.getLastSyllable();
+			if (last == null) restrictions = Syllable.NO_RESTRICTIONS;
+			else {
+				if (!last.closedEnd()) restrictions = Syllable.FORCED_CLOSED_START;
+			}
+			
+			Syllable syl = word.generateSyllable(restrictions); // create syllable
+			word.addSyllable(syl);
 		}
-		return word;
-	}
-	
-	public static Syllable generateSyllable(boolean closed) {
-		// structure of a syllable:
-		// n-length consonant blend (optional), n-length vowel blend, n-length consonant blend (optional if not closed)
-		// steps:
-		//	search for any letter
-		//	search for any compatible next letter (continue until vowel)
-		//	search for compatible next letter (continue until consonant or vowel length 3; eg: iou, eau)
-		//	if closed, search for consonant
-		//	search for compatible consonant or quit
-		return null;
+		return word.toString();
 	}
 	
 }
